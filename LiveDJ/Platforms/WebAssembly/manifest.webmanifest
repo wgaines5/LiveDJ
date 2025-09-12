@@ -1,0 +1,10 @@
+{
+  "background_color": "#ffffff",
+  "description": "LiveDJ",
+  "display": "standalone",
+  "name": "LiveDJ",
+  "short_name": "LiveDJ",
+  "start_url": "/index.html",
+  "theme_color": "#ffffff",
+  "scope": "/"
+}

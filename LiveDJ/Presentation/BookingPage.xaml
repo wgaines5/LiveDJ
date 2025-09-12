@@ -1,0 +1,38 @@
+﻿<Page
+    x:Class="LiveDJ.Presentation.BookingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Background="Transparent">
+
+    <Grid>
+        <!-- Background image -->
+        <Image Source="ms-appx:///Assets/ClubSET.png"
+               Stretch="UniformToFill"
+               Opacity="1.0"/>
+        <!-- Adjust opacity so text/buttons remain clear -->
+
+        <!-- Foreground content -->
+        <StackPanel Spacing="16" Padding="24">
+            <TextBlock Padding="50" HorizontalAlignment="Center" Text="Book a Live Stream" FontSize="28" Foreground="Red" FontWeight="Bold"/>
+
+            <CalendarDatePicker HorizontalAlignment="Center" x:Name="DatePicker"/>
+            <TimePicker HorizontalAlignment="Center" x:Name="TimePicker"/>
+
+            <ComboBox x:Name="DurationBox" PlaceholderText="Select duration">
+                <ComboBoxItem Content="2 Hours $100" Tag="2"/>
+                <ComboBoxItem Content="4 Hours $250" Tag="4"/>
+                <ComboBoxItem Content="6 Hours $350" Tag="6"/>
+            </ComboBox>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button x:Name="ReserveBtn" Background="DarkGreen" Content="Reserve Slot" Click="OnReserve"/>
+                <Button x:Name="CheckoutBtn" Background="LightGreen" Content="Pay &amp; Reserve" Click="OnCheckout" IsEnabled="False"/>
+            </StackPanel>
+
+            <TextBlock x:Name="StatusText" TextWrapping="Wrap"/>
+
+            <Button HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Red" Content="Cancel" Click="OnCancel"/>
+
+        </StackPanel>
+    </Grid>
+</Page>
