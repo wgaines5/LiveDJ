@@ -1,0 +1,32 @@
+﻿<Page
+    x:Class="LiveDJ.Presentation.SignupPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:utu="using:Uno.Toolkit.UI"
+    Background="Transparent">
+
+    <Grid>
+        <!-- Optional background image -->
+        <Image Source="ms-appx:///Assets/ClubSet.png" Stretch="UniformToFill" Opacity="0.25"/>
+
+        <StackPanel MaxWidth="520" Spacing="12" Padding="24" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <utu:NavigationBar Content="DJ Sign Up" Background="#CC111111" Foreground="White" />
+
+            <TextBox x:Name="NameBox" PlaceholderText="DJ/Artist Name"/>
+            <TextBox x:Name="EmailBox" PlaceholderText="Email" InputScope="EmailSmtpAddress"/>
+            <PasswordBox x:Name="PasswordBox" PlaceholderText="Password"/>
+            <PasswordBox x:Name="ConfirmBox" PlaceholderText="Confirm Password"/>
+
+            <TextBox x:Name="PhoneBox" PlaceholderText="Phone (e.g., 555-123-4567)"/>
+            <TextBox x:Name="StateBox" PlaceholderText="State (e.g., CA)"/>
+            <TextBox x:Name="AddressBox" PlaceholderText="Address" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
+
+            <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button Content="Create Account" Click="OnSignUp"/>
+                <Button Content="Cancel" Click="OnCancel"/>
+            </StackPanel>
+
+            <TextBlock x:Name="StatusText" TextWrapping="Wrap"/>
+        </StackPanel>
+    </Grid>
+</Page>

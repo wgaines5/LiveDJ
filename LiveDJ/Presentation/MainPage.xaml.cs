@@ -16,6 +16,9 @@ public sealed partial class MainPage : Page
     private async void GoToStream(object sender, RoutedEventArgs e) =>
         await Navigator.NavigateViewAsync<StreamPage>(this);
 
-    private async void OnLogin(object sender, RoutedEventArgs e) =>
-        await Navigator.NavigateViewAsync<StreamPage>(this);
+    private async void GoToLogin(object sender, RoutedEventArgs e) =>
+    await Navigator.NavigateRouteAsync(this, "Login");
+
+    private async void GoToSignup(object sender, RoutedEventArgs e) =>
+    await Navigator.NavigateRouteAsync(this, "Signup");
 }

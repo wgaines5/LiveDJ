@@ -1,3 +1,5 @@
+using LiveDJ.Presentation;
+using LiveDJ.Services;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,7 +10,6 @@ using Uno.Extensions.Hosting;
 using Uno.Extensions.Navigation;
 using Uno.Logging;
 using Uno.Resizetizer;
-using LiveDJ.Presentation;
 
 namespace LiveDJ;
 
@@ -63,6 +64,8 @@ public partial class App : Application
                         o.ApiBaseUrl = "https://localhost:5235/"; // TODO: set env-specific URL
                     });
 
+                    services.AddSingleton<AuthState>();
+                    services.AddHttpClient<FirebaseAuthService>();
                     // other services here...
                 })
 
@@ -85,19 +88,25 @@ public partial class App : Application
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
         views.Register(
-            new ViewMap(ViewModel: typeof(ShellModel)),
-            new ViewMap<MainPage, MainModel>(),
+            new ViewMap(ViewModel: typeof(ShellModel)),     // Shell (UserControl)
+            new ViewMap<MainPage, MainModel>(),           // <-- map MainModel to MainPage
+            new ViewMap<LoginPage>(),
+            new ViewMap<SignupPage>(),
             new ViewMap<BookingPage>(),
-            new ViewMap<StreamPage>());
+            new ViewMap<StreamPage>()
+        );
 
         routes.Register(
             new RouteMap("",
                 View: views.FindByViewModel<ShellModel>(),
                 Nested:
                 [
-                    new ("Main",    View: views.FindByViewModel<MainModel>(), IsDefault:true),
+                    new ("Main",    View: views.FindByViewModel<MainModel>(), IsDefault: true),
+                    new ("Login",   View: views.FindByView<LoginPage>()),
+                    new ("Signup",  View: views.FindByView<SignupPage>()),
                     new ("Booking", View: views.FindByView<BookingPage>()),
                     new ("Stream",  View: views.FindByView<StreamPage>())
-                ]));
+                ])
+        );
     }
 }

@@ -30,6 +30,9 @@
             </StackPanel>
         </Grid>
 
-        <Button FontWeight="Normal" VerticalAlignment="Bottom" Background="Gold" Foreground="Black" HorizontalAlignment="Right" Margin="10" Content="Login" Click="OnLogin"/>
+        <Button FontWeight="Normal" VerticalAlignment="Bottom" Background="Gold" Foreground="Black" HorizontalAlignment="Right"
+                Margin="10" Content="Login" Click="GoToLogin"/>
+        <Button FontWeight="Normal" VerticalAlignment="Bottom" Background="MediumSpringGreen" Foreground="Black" 
+                Margin="10" Content="DJ Sign Up" Click="GoToSignup"/>
     </Grid>
 </Page>
