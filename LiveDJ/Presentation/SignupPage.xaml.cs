@@ -36,6 +36,7 @@ public sealed partial class SignupPage : Page
         var pw2 = ConfirmBox.Password ?? "";
         var phone = PhoneBox.Text?.Trim();
         var state = StateBox.Text?.Trim();
+        var city = StateBox.Text?.Trim();
         var addr = AddressBox.Text?.Trim();
 
         // Simple validation
@@ -56,21 +57,19 @@ public sealed partial class SignupPage : Page
         try
         {
             StatusText.Text = "Creating account…";
-            var (ok, err, uid) = await _auth.SignUpAsync(email, pw);
+            var (ok, err, uid) = await _auth.SignUpAsync(email!, pw);
             if (!ok || string.IsNullOrEmpty(uid))
             {
                 StatusText.Text = err ?? "Sign-up failed.";
                 return;
             }
 
-            // Attach bearer token for backend profile save
-            if (!string.IsNullOrEmpty(_state.IdToken))
-            {
-                _http.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _state.IdToken);
-            }
+            // Ensure we have a fresh IdToken (SignUpAsync already sets it)
+            // If you ever need: await _auth.TryRefreshAsync();
 
-            // Send profile to your backend
+            // --- SAVE PROFILE DIRECTLY TO FIREBASE REALTIME DATABASE ---
+            // Your project shows as: live-dj-f5fad-default-rtdb
+            // Path: /djs/{uid}
             var profile = new DjProfileCreate
             {
                 Uid = uid,
@@ -78,23 +77,36 @@ public sealed partial class SignupPage : Page
                 Email = email!,
                 Phone = phone,
                 State = state,
+                City = city,
                 Address = addr
             };
 
-            var resp = await _http.PostAsJsonAsync("api/djs", profile);
+            // IMPORTANT: absolute URL ignores _http.BaseAddress, so we can reuse _http.
+            var dbUrl =
+                $"https://live-dj-f5fad-default-rtdb.firebaseio.com/djs/{uid}.json?auth={_state.IdToken}";
+
+            var resp = await _http.PutAsJsonAsync(dbUrl, profile);
             if (!resp.IsSuccessStatusCode)
             {
                 var body = await resp.Content.ReadAsStringAsync();
                 StatusText.Text = $"Saved auth, but failed to save profile: {resp.StatusCode} {body}";
                 return;
             }
+            // --- END SAVE ---
 
             StatusText.Text = "Welcome! Your DJ account is ready.";
-            // go back to Main
-            if (await Nav.CanGoBack()) 
-                await Nav.NavigateBackAsync(this);
 
-            else await Nav.NavigateRouteAsync(this, "Main");
+            // ➜ Go to Create Profile (optional but recommended so they add photo/genres)
+            var payload = new Dictionary<string, object>
+            {
+                ["Uid"] = uid,
+                ["Name"] = name!,
+                ["Email"] = email!,
+                ["City"] = city!,
+                ["State"] = state ?? ""
+                
+            };
+            await Nav.NavigateRouteAsync(this, "CreateProfile", data: payload);
         }
         catch (Exception ex)
         {
@@ -115,6 +127,7 @@ public sealed partial class SignupPage : Page
         public string Email { get; set; } = default!;
         public string? Phone { get; set; }
         public string? State { get; set; }
+        public string? City { get; set; }
         public string? Address { get; set; }
     }
 }

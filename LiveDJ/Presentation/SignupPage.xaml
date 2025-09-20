@@ -19,6 +19,7 @@
 
             <TextBox x:Name="PhoneBox" PlaceholderText="Phone (e.g., 555-123-4567)"/>
             <TextBox x:Name="StateBox" PlaceholderText="State (e.g., CA)"/>
+            <TextBox x:Name="CityBox" PlaceholderText="City"/>
             <TextBox x:Name="AddressBox" PlaceholderText="Address" TextWrapping="Wrap" AcceptsReturn="True" Height="72"/>
 
             <StackPanel Orientation="Horizontal" Spacing="12">
