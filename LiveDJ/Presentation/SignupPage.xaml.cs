@@ -36,7 +36,7 @@ public sealed partial class SignupPage : Page
         var pw2 = ConfirmBox.Password ?? "";
         var phone = PhoneBox.Text?.Trim();
         var state = StateBox.Text?.Trim();
-        var city = StateBox.Text?.Trim();
+        var city = CityBox.Text?.Trim();
         var addr = AddressBox.Text?.Trim();
 
         // Simple validation
@@ -64,12 +64,6 @@ public sealed partial class SignupPage : Page
                 return;
             }
 
-            // Ensure we have a fresh IdToken (SignUpAsync already sets it)
-            // If you ever need: await _auth.TryRefreshAsync();
-
-            // --- SAVE PROFILE DIRECTLY TO FIREBASE REALTIME DATABASE ---
-            // Your project shows as: live-dj-f5fad-default-rtdb
-            // Path: /djs/{uid}
             var profile = new DjProfileCreate
             {
                 Uid = uid,
@@ -81,7 +75,6 @@ public sealed partial class SignupPage : Page
                 Address = addr
             };
 
-            // IMPORTANT: absolute URL ignores _http.BaseAddress, so we can reuse _http.
             var dbUrl =
                 $"https://live-dj-f5fad-default-rtdb.firebaseio.com/djs/{uid}.json?auth={_state.IdToken}";
 
@@ -102,7 +95,7 @@ public sealed partial class SignupPage : Page
                 ["Uid"] = uid,
                 ["Name"] = name!,
                 ["Email"] = email!,
-                ["City"] = city!,
+                ["City"] = city ?? "",
                 ["State"] = state ?? ""
                 
             };
