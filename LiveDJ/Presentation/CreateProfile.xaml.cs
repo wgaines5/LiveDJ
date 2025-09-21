@@ -26,7 +26,7 @@ using Windows.UI; // Colors
 
 namespace LiveDJ.Presentation
 {
-    public sealed partial class ProfilePage : Page
+    public sealed partial class CreateProfile : Page
     {
         private readonly AuthState _state;
         private readonly HttpClient _http;
@@ -46,7 +46,7 @@ namespace LiveDJ.Presentation
         private string _stateCode = "";
         private string _city = "";
 
-        public ProfilePage()
+        public CreateProfile()
         {
             InitializeComponent();
             DataContext = this;

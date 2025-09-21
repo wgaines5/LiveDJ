@@ -94,7 +94,7 @@ public partial class App : Application
     new ViewMap<SignupPage>(),
     new ViewMap<BookingPage>(),
     new ViewMap<StreamPage>(),
-    new ViewMap<ProfilePage>()                  // ⬅️ add this
+    new ViewMap<CreateProfile>()                  // ⬅️ add this
 );
 
         routes.Register(
@@ -105,7 +105,7 @@ public partial class App : Application
                     new ("Main",    View: views.FindByViewModel<MainModel>(), IsDefault: true),
                     new ("Login",   View: views.FindByView<LoginPage>()),
                     new ("Signup",  View: views.FindByView<SignupPage>()),
-                    new ("CreateProfile", View: views.FindByView<ProfilePage>()),
+                    new ("CreateProfile", View: views.FindByView<CreateProfile>()),
                     new ("Booking", View: views.FindByView<BookingPage>()),
                     new ("Stream",  View: views.FindByView<StreamPage>()) 
                 ]
