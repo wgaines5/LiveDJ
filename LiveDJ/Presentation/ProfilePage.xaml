@@ -1,0 +1,58 @@
+﻿<Page
+    x:Class="LiveDJ.Presentation.ProfilePage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LiveDJ.Presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:utu="using:Uno.Toolkit.UI"
+    Background="Transparent">
+
+    <Grid>
+        <Image x:Name="BgImage" Stretch="UniformToFill" Opacity="0.25"/>
+        <ScrollViewer>
+            <StackPanel MaxWidth="720" Margin="16" Spacing="12">
+                <utu:NavigationBar Content="Your Profile" Background="#B3000000" Foreground="White" />
+
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Ellipse Width="96" Height="96">
+                        <Ellipse.Fill>
+                            <ImageBrush x:Name="AvatarBrush" />
+                        </Ellipse.Fill>
+                    </Ellipse>
+                    <StackPanel>
+                        <TextBlock x:Name="NameText" FontSize="24" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="EmailText"/>
+                        <TextBlock x:Name="LocationText"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <TextBlock Text="Bio" FontWeight="SemiBold"/>
+                <TextBlock x:Name="BioText" TextWrapping="Wrap"/>
+
+                <TextBlock Text="Genres" FontWeight="SemiBold"/>
+                <ItemsControl x:Name="GenresList">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border CornerRadius="12" Padding="8" Margin="4" Background="#22000000">
+                                <TextBlock Text="{Binding}"/>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapGrid MaximumRowsOrColumns="6"/>
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ItemsControl>
+
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Portfolio:" FontWeight="SemiBold"/>
+                    <HyperlinkButton x:Name="PortfolioLink" Content="Open" />
+                </StackPanel>
+
+                <Button Content="Edit Profile" Click="OnEdit"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

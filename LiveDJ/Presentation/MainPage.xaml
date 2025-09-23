@@ -20,6 +20,15 @@
 
             <utu:NavigationBar FontWeight="ExtraBold" FontSize="20" FontStretch="SemiCondensed" Content="{Binding Title}" Padding="10" Background="Transparent" Foreground="DeepSkyBlue"/>
 
+            <StackPanel Spacing="10" Margin="8,8,0,0">
+                <TextBlock Text="Browse DJs" FontWeight="SemiBold"/>
+                <ComboBox Margin="20" VerticalAlignment="Center" x:Name="DjPicker"
+                          ItemsSource="{Binding Djs}"
+                          DisplayMemberPath="Display"
+                          PlaceholderText="Select a DJ…"
+                          SelectionChanged="OnDjPicked"/>
+            </StackPanel>
+            
             <StackPanel Grid.Row="1"
                         Spacing="16"
                         HorizontalAlignment="Center"

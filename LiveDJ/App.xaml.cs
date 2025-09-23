@@ -88,13 +88,14 @@ public partial class App : Application
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
         views.Register(
-    new ViewMap(ViewModel: typeof(ShellModel)),
-    new ViewMap<MainPage, MainModel>(),
-    new ViewMap<LoginPage>(),
-    new ViewMap<SignupPage>(),
-    new ViewMap<BookingPage>(),
-    new ViewMap<StreamPage>(),
-    new ViewMap<CreateProfile>()
+            new ViewMap(ViewModel: typeof(ShellModel)),
+            new ViewMap<MainPage, MainModel>(),
+            new ViewMap<LoginPage>(),
+            new ViewMap<SignupPage>(),
+            new ViewMap<BookingPage>(),
+            new ViewMap<StreamPage>(),
+            new ViewMap<CreateProfile>(),
+            new ViewMap<ProfilePage>()
 );
 
         routes.Register(
@@ -106,8 +107,9 @@ public partial class App : Application
                     new ("Login",   View: views.FindByView<LoginPage>()),
                     new ("Signup",  View: views.FindByView<SignupPage>()),
                     new ("CreateProfile", View: views.FindByView<CreateProfile>()),
+                    new ("Profile", View: views.FindByView<ProfilePage>()),
                     new ("Booking", View: views.FindByView<BookingPage>()),
-                    new ("Stream",  View: views.FindByView<StreamPage>()) 
+                    new ("Stream",  View: views.FindByView<StreamPage>())
                 ]
             )
         

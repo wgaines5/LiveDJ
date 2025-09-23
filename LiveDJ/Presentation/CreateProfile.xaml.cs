@@ -297,7 +297,7 @@ namespace LiveDJ.Presentation
                 }
 
                 StatusText.Text = "Profile saved!";
-                await this.Navigator().NavigateRouteAsync(this, "Main");
+                await this.Navigator().NavigateRouteAsync(this, "Profile");
             }
             catch (Exception ex)
             {
