@@ -51,14 +51,14 @@ public sealed partial class LoginPage : Page
         if (!ok) { StatusText.Text = err ?? "Failed"; return; }
 
 
-        // Navigate to Main after successful login
+        
         await this.Navigator().NavigateRouteAsync(this, "Main");
     }
 
 
     private async void OnForgot(object sender, RoutedEventArgs e)
     {
-        // (Optional) implement sendOobCode for PASSWORD_RESET using Firebase REST
+        
         ContentDialog dlg = new() { Title = "Coming soon", Content = "Password reset flow not implemented yet.", PrimaryButtonText = "OK" };
         await dlg.ShowAsync();
     }

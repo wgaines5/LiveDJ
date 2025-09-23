@@ -39,7 +39,7 @@ public sealed partial class SignupPage : Page
         var city = CityBox.Text?.Trim();
         var addr = AddressBox.Text?.Trim();
 
-        // Simple validation
+       
         if (string.IsNullOrWhiteSpace(name) ||
             string.IsNullOrWhiteSpace(email) ||
             string.IsNullOrWhiteSpace(pw) ||
@@ -85,11 +85,9 @@ public sealed partial class SignupPage : Page
                 StatusText.Text = $"Saved auth, but failed to save profile: {resp.StatusCode} {body}";
                 return;
             }
-            // --- END SAVE ---
 
             StatusText.Text = "Welcome! Your DJ account is ready.";
 
-            // ➜ Go to Create Profile (optional but recommended so they add photo/genres)
             var payload = new Dictionary<string, object>
             {
                 ["Uid"] = uid,

@@ -22,7 +22,7 @@ using Microsoft.UI.Xaml.Navigation;
 
 using Uno.Extensions.Navigation;
 
-using Windows.UI; // Colors
+using Windows.UI; 
 
 namespace LiveDJ.Presentation
 {
@@ -36,7 +36,7 @@ namespace LiveDJ.Presentation
         private static readonly SolidColorBrush BlackBrush =
             new SolidColorBrush(Color.FromArgb(0xFF, 0x00, 0x00, 0x00));
 
-        // Two-column source (we render controls manually)
+        // Two-column source 
         public ObservableCollection<GenreItem> Genres { get; } = new();
 
         // Values passed from SignUp or loaded from Firebase
@@ -129,7 +129,7 @@ namespace LiveDJ.Presentation
             }
             catch
             {
-                // ignore load failures; UI remains editable
+                
             }
         }
 

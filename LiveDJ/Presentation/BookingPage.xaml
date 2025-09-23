@@ -9,7 +9,7 @@
         <Image Source="ms-appx:///Assets/ClubSET.png"
                Stretch="UniformToFill"
                Opacity="1.0"/>
-        <!-- Adjust opacity so text/buttons remain clear -->
+        >
 
         <!-- Foreground content -->
         <StackPanel Spacing="16" Padding="24">

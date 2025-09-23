@@ -94,7 +94,7 @@ public partial class App : Application
     new ViewMap<SignupPage>(),
     new ViewMap<BookingPage>(),
     new ViewMap<StreamPage>(),
-    new ViewMap<CreateProfile>()                  // ⬅️ add this
+    new ViewMap<CreateProfile>()
 );
 
         routes.Register(

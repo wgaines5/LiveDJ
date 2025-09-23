@@ -30,7 +30,6 @@ public sealed partial class BookingPage : Page
     {
         CheckoutBtn.IsEnabled = false;
 
-        // Validate selection
         if (DurationBox.SelectedItem is not ComboBoxItem selected)
         {
             StatusText.Text = "Please select a duration.";
