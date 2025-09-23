@@ -38,6 +38,11 @@
     </UnoFeatures>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Update="Presentation\CreateProfile.xaml.cs">
+      <DependentUpon>CreateProfile.xaml</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
     <Page Update="Presentation\BookingPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -54,6 +59,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Presentation\SignupPage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Presentation\CreateProfile.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

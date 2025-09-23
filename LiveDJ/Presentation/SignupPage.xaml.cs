@@ -36,9 +36,10 @@ public sealed partial class SignupPage : Page
         var pw2 = ConfirmBox.Password ?? "";
         var phone = PhoneBox.Text?.Trim();
         var state = StateBox.Text?.Trim();
+        var city = CityBox.Text?.Trim();
         var addr = AddressBox.Text?.Trim();
 
-        // Simple validation
+       
         if (string.IsNullOrWhiteSpace(name) ||
             string.IsNullOrWhiteSpace(email) ||
             string.IsNullOrWhiteSpace(pw) ||
@@ -56,21 +57,13 @@ public sealed partial class SignupPage : Page
         try
         {
             StatusText.Text = "Creating account…";
-            var (ok, err, uid) = await _auth.SignUpAsync(email, pw);
+            var (ok, err, uid) = await _auth.SignUpAsync(email!, pw);
             if (!ok || string.IsNullOrEmpty(uid))
             {
                 StatusText.Text = err ?? "Sign-up failed.";
                 return;
             }
 
-            // Attach bearer token for backend profile save
-            if (!string.IsNullOrEmpty(_state.IdToken))
-            {
-                _http.DefaultRequestHeaders.Authorization =
-                    new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _state.IdToken);
-            }
-
-            // Send profile to your backend
             var profile = new DjProfileCreate
             {
                 Uid = uid,
@@ -78,10 +71,14 @@ public sealed partial class SignupPage : Page
                 Email = email!,
                 Phone = phone,
                 State = state,
+                City = city,
                 Address = addr
             };
 
-            var resp = await _http.PostAsJsonAsync("api/djs", profile);
+            var dbUrl =
+                $"https://live-dj-f5fad-default-rtdb.firebaseio.com/djs/{uid}.json?auth={_state.IdToken}";
+
+            var resp = await _http.PutAsJsonAsync(dbUrl, profile);
             if (!resp.IsSuccessStatusCode)
             {
                 var body = await resp.Content.ReadAsStringAsync();
@@ -90,11 +87,17 @@ public sealed partial class SignupPage : Page
             }
 
             StatusText.Text = "Welcome! Your DJ account is ready.";
-            // go back to Main
-            if (await Nav.CanGoBack()) 
-                await Nav.NavigateBackAsync(this);
 
-            else await Nav.NavigateRouteAsync(this, "Main");
+            var payload = new Dictionary<string, object>
+            {
+                ["Uid"] = uid,
+                ["Name"] = name!,
+                ["Email"] = email!,
+                ["City"] = city ?? "",
+                ["State"] = state ?? ""
+                
+            };
+            await Nav.NavigateRouteAsync(this, "CreateProfile", data: payload);
         }
         catch (Exception ex)
         {
@@ -115,6 +118,7 @@ public sealed partial class SignupPage : Page
         public string Email { get; set; } = default!;
         public string? Phone { get; set; }
         public string? State { get; set; }
+        public string? City { get; set; }
         public string? Address { get; set; }
     }
 }

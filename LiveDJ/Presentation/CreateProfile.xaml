@@ -1,0 +1,84 @@
+﻿<Page
+    x:Class="LiveDJ.Presentation.CreateProfile"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:utu="using:Uno.Toolkit.UI"
+    Background="Transparent">
+
+    <Grid>
+        <!-- Background preview -->
+        <Image x:Name="BgPreview"
+               Source="ms-appx:///Assets/ClubSET.png"
+               Stretch="UniformToFill"
+               Opacity="0.20"/>
+
+        <ScrollViewer>
+            <StackPanel MaxWidth="720" Margin="16" Spacing="14">
+
+                <utu:NavigationBar Content="Create Your DJ Profile"
+                                   Background="#B3000000"
+                                   Foreground="White" />
+
+                <!-- Profile + Background images -->
+                <StackPanel Orientation="Vertical" Spacing="16">
+
+                    <!-- Profile Photo -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Profile Photo URL"/>
+                        <TextBox x:Name="PhotoUrlBox"
+                                 PlaceholderText="https://..."
+                                 TextChanged="OnPhotoUrlChanged"/>
+                        <Border Height="140" Background="#22000000">
+                            <Image x:Name="PhotoPreview" Stretch="UniformToFill"/>
+                        </Border>
+                    </StackPanel>
+
+                    <!-- Background Photo -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Background Photo URL"/>
+                        <TextBox x:Name="BgUrlBox"
+                                 PlaceholderText="https://..."
+                                 TextChanged="OnBgUrlChanged"/>
+                        <Border Height="140" Background="#22000000">
+                            <Image x:Name="BgInlinePreview" Stretch="UniformToFill"/>
+                        </Border>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Readonly State label (filled from payload or Firebase) -->
+                <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                    <TextBlock Text="State:" FontWeight="SemiBold"/>
+                    <TextBlock x:Name="StateText"/>
+                </StackPanel>
+
+                <!-- Bio -->
+                <TextBlock Text="Bio"/>
+                <TextBox x:Name="BioBox"
+                         TextWrapping="Wrap"
+                         AcceptsReturn="True"
+                         Height="120"
+                         PlaceholderText="Tell fans about your style, experience, and vibe…"/>
+
+                <!-- Genres (two columns, checkboxes) -->
+                <StackPanel Background="#5A000000" Padding="10" CornerRadius="12" Spacing="8">
+                    <TextBlock Text="Select Your Genres (check all that apply)"/>
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                        <StackPanel x:Name="LeftGenresStack"/>
+                        <StackPanel x:Name="RightGenresStack" Grid.Column="1"/>
+                    </Grid>
+                </StackPanel>
+
+                <!-- Portfolio -->
+                <TextBlock Text="Portfolio URL (EPK, Linktree, site)"/>
+                <TextBox x:Name="PortfolioUrlBox" PlaceholderText="https://…"/>
+
+                <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+                    <Button Content="Save Profile" Click="OnSave"/>
+                    <Button Content="Skip for now" Click="OnSkip"/>
+                </StackPanel>
+
+                <TextBlock x:Name="StatusText" TextWrapping="Wrap"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>
