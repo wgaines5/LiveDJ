@@ -1,0 +1,116 @@
+﻿<Page
+    x:Class="LiveDJ.Presentation.DashboardPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:LiveDJ.Presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+   xmlns:utu="using:Uno.Toolkit.UI"
+    Background="Transparent">
+
+    <Grid>
+        <!-- Background preview -->
+        <Image x:Name="BgImage"
+               Source="ms-appx:///Assets/ClubSET.png"
+               Stretch="UniformToFill"
+               Opacity="0.20"/>
+
+        <ScrollViewer>
+            <StackPanel MaxWidth="800" Margin="16" Spacing="14">
+
+                <utu:NavigationBar Content="DJ Dashboard"
+                                   Background="#B3000000"
+                                   Foreground="White" />
+
+                <!-- Profile header -->
+                <Grid ColumnSpacing="12" RowSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Ellipse Width="84" Height="84">
+                        <Ellipse.Fill>
+                            <ImageBrush x:Name="AvatarBrush"/>
+                        </Ellipse.Fill>
+                    </Ellipse>
+
+                    <StackPanel Grid.Column="1">
+                        <TextBlock x:Name="NameText" FontSize="22" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="EmailText"/>
+                        <TextBlock x:Name="LocationText"/>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center">
+                        <Button Content="Edit Profile" Click="OnEditProfile"/>
+                        <Button Content="View Profile" Click="OnViewProfile"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- Availability -->
+                <StackPanel Background="#5A000000" Padding="12" CornerRadius="12" Spacing="10">
+                    <TextBlock Text="Availability" FontWeight="SemiBold" FontSize="18"/>
+
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <ToggleSwitch x:Name="OpenSwitch" Header="Open to bookings"/>
+                        <StackPanel>
+                            <TextBlock Text="Timezone"/>
+                            <ComboBox x:Name="TzBox" Width="280"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Day rows -->
+                    <Grid ColumnSpacing="8" RowSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="2*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Header row -->
+                        <TextBlock Text="Day" FontWeight="SemiBold"/>
+                        <TextBlock Text="Start" Grid.Column="1" FontWeight="SemiBold"/>
+                        <TextBlock Text="End"   Grid.Column="2" FontWeight="SemiBold"/>
+
+                        <ItemsControl x:Name="DaysRepeater" Grid.ColumnSpan="3" Margin="0,6,0,0">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid ColumnSpacing="8" Margin="0,4">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="2*"/>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="*"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Orientation="Horizontal" Spacing="8">
+                                            <CheckBox IsChecked="{Binding IsAvailable, Mode=TwoWay}"/>
+                                            <TextBlock Text="{Binding Label}"/>
+                                        </StackPanel>
+
+                                        <TimePicker Grid.Column="1"
+                                                    IsEnabled="{Binding IsAvailable}"
+                                                    Time="{Binding Start, Mode=TwoWay}"/>
+                                        <TimePicker Grid.Column="2"
+                                                    IsEnabled="{Binding IsAvailable}"
+                                                    Time="{Binding End, Mode=TwoWay}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Grid>
+
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Button Content="Save Availability" Click="OnSaveAvailability"/>
+                        <TextBlock x:Name="StatusText" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</Page>

@@ -37,6 +37,10 @@
       SkiaRenderer;
     </UnoFeatures>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(TargetFramework)'=='net9.0-ios'">
+    <CodesignKey>Apple Development: Created via API (Z46KVSYZ73)</CodesignKey>
+    <CodesignProvision>VS: com.companyname.LiveDJ Development</CodesignProvision>
+  </PropertyGroup>
   <ItemGroup>
     <Compile Update="Presentation\CreateProfile.xaml.cs">
       <DependentUpon>CreateProfile.xaml</DependentUpon>
@@ -69,6 +73,11 @@
   </ItemGroup>
   <ItemGroup>
     <Page Update="Presentation\ProfilePage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Page Update="Presentation\DashboardPage.xaml">
       <Generator>MSBuild:Compile</Generator>
     </Page>
   </ItemGroup>

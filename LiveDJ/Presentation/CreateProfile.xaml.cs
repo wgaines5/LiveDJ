@@ -107,21 +107,21 @@ namespace LiveDJ.Presentation
                 var existing = await _http.GetFromJsonAsync<DjProfileDto>(dbUrl);
                 if (existing is null) return;
 
-                if (string.IsNullOrWhiteSpace(_name) && !string.IsNullOrWhiteSpace(existing.name)) _name = existing.name!;
-                if (string.IsNullOrWhiteSpace(_email) && !string.IsNullOrWhiteSpace(existing.email)) _email = existing.email!;
-                if (string.IsNullOrWhiteSpace(_stateCode) && !string.IsNullOrWhiteSpace(existing.state)) _stateCode = existing.state!;
-                if (string.IsNullOrWhiteSpace(_city) && !string.IsNullOrWhiteSpace(existing.city)) _city = existing.city!;
+                if (string.IsNullOrWhiteSpace(_name) && !string.IsNullOrWhiteSpace(existing.Name)) _name = existing.Name!;
+                if (string.IsNullOrWhiteSpace(_email) && !string.IsNullOrWhiteSpace(existing.Email)) _email = existing.Email!;
+                if (string.IsNullOrWhiteSpace(_stateCode) && !string.IsNullOrWhiteSpace(existing.State)) _stateCode = existing.State!;
+                if (string.IsNullOrWhiteSpace(_city) && !string.IsNullOrWhiteSpace(existing.City)) _city = existing.City!;
 
                 StateText.Text = string.IsNullOrWhiteSpace(_stateCode) ? "(not set)" : _stateCode;
 
-                if (!string.IsNullOrWhiteSpace(existing.photoUrl)) PhotoUrlBox.Text = existing.photoUrl!;
-                if (!string.IsNullOrWhiteSpace(existing.backgroundUrl)) BgUrlBox.Text = existing.backgroundUrl!;
-                if (!string.IsNullOrWhiteSpace(existing.bio)) BioBox.Text = existing.bio!;
-                if (!string.IsNullOrWhiteSpace(existing.portfolioUrl)) PortfolioUrlBox.Text = existing.portfolioUrl!;
+                if (!string.IsNullOrWhiteSpace(existing.PhotoUrl)) PhotoUrlBox.Text = existing.PhotoUrl!;
+                if (!string.IsNullOrWhiteSpace(existing.BackgroundUrl)) BgUrlBox.Text = existing.BackgroundUrl!;
+                if (!string.IsNullOrWhiteSpace(existing.Bio)) BioBox.Text = existing.Bio!;
+                if (!string.IsNullOrWhiteSpace(existing.PortfolioUrl)) PortfolioUrlBox.Text = existing.PortfolioUrl!;
 
-                if (existing.genres is { Length: > 0 })
+                if (existing.Genres is { Length: > 0 })
                 {
-                    var sel = existing.genres.ToHashSet(StringComparer.OrdinalIgnoreCase);
+                    var sel = existing.Genres.ToHashSet(StringComparer.OrdinalIgnoreCase);
                     foreach (var g in Genres)
                         g.IsSelected = sel.Contains(g.Name);
                     BuildGenresUI(); // re-draw checkboxes to reflect selection
@@ -348,18 +348,18 @@ namespace LiveDJ.Presentation
 
         private sealed class DjProfileDto
         {
-            public string? uid { get; set; }
-            public string? name { get; set; }
-            public string? email { get; set; }
-            public string? phone { get; set; }
-            public string? address { get; set; }
-            public string? city { get; set; }
-            public string? state { get; set; }
-            public string? photoUrl { get; set; }
-            public string? backgroundUrl { get; set; }
-            public string? bio { get; set; }
-            public string? portfolioUrl { get; set; }
-            public string[]? genres { get; set; }
+            public string? Uid { get; set; }
+            public string? Name { get; set; }
+            public string? Email { get; set; }
+            public string? Phone { get; set; }
+            public string? Address { get; set; }
+            public string? City { get; set; }
+            public string? State { get; set; }
+            public string? PhotoUrl { get; set; }
+            public string? BackgroundUrl { get; set; }
+            public string? Bio { get; set; }
+            public string? PortfolioUrl { get; set; }
+            public string[]? Genres { get; set; }
         }
 
         #endregion

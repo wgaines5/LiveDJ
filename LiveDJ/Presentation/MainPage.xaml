@@ -18,9 +18,9 @@
                 <RowDefinition/>
             </Grid.RowDefinitions>
 
-            <utu:NavigationBar FontWeight="ExtraBold" FontSize="20" FontStretch="SemiCondensed" Content="{Binding Title}" Padding="10" Background="Transparent" Foreground="DeepSkyBlue"/>
+            <utu:NavigationBar FontWeight="ExtraBold" FontSize="20" FontStretch="SemiCondensed" Content="{Binding Title}" Padding="8" Background="Transparent" Foreground="DeepSkyBlue"/>
 
-            <StackPanel Spacing="10" Margin="8,8,0,0">
+            <StackPanel Spacing="10" Padding="12" Margin="8,8,0,0">
                 <TextBlock Text="Browse DJs" FontWeight="SemiBold"/>
                 <ComboBox Margin="20" VerticalAlignment="Center" x:Name="DjPicker"
                           ItemsSource="{Binding Djs}"
@@ -34,12 +34,14 @@
                         HorizontalAlignment="Center"
                         VerticalAlignment="Center">
                 <Button HorizontalAlignment="Center" Background="Green" Content="Book Your DJ Slot" Click="GoToBooking"/>
-                <Button HorizontalAlignment="Center" Background="Red" Content="Watch Stream" Click="GoToStream"/>
+                <Button HorizontalAlignment="Center" Background="OrangeRed" Content="Watch Stream" Click="GoToStream"/>
                 
             </StackPanel>
         </Grid>
 
-        <Button FontWeight="Normal" VerticalAlignment="Bottom" Background="Gold" Foreground="Black" HorizontalAlignment="Right"
+        <Button Margin="10" VerticalAlignment="Bottom" HorizontalAlignment="Right" Background="Red" Foreground="Black" Content="DJ Dash" Click="GoToDashboard" />
+
+        <Button FontWeight="Normal" VerticalAlignment="Bottom" Background="Gold" Foreground="Black" HorizontalAlignment="Center"
                 Margin="10" Content="Login" Click="GoToLogin"/>
         <Button FontWeight="Normal" VerticalAlignment="Bottom" Background="MediumSpringGreen" Foreground="Black" 
                 Margin="10" Content="DJ Sign Up" Click="GoToSignup"/>

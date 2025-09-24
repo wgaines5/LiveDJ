@@ -60,19 +60,19 @@ namespace LiveDJ.Presentation
             if (dto is null) return;
 
 
-            NameText.Text = dto.name ?? "";
-            EmailText.Text = dto.email ?? "";
-            LocationText.Text = $"{dto.city ?? ""} {dto.state ?? ""}".Trim();
-            BioText.Text = dto.bio ?? "";
-            GenresList.ItemsSource = dto.genres ?? Array.Empty<string>();
+            NameText.Text = dto.Name ?? "";
+            EmailText.Text = dto.Email ?? "";
+            LocationText.Text = $"{dto.City ?? ""} {dto.State ?? ""}".Trim();
+            BioText.Text = dto.Bio ?? "";
+            GenresList.ItemsSource = dto.Genres ?? Array.Empty<string>();
 
-            if (!string.IsNullOrWhiteSpace(dto.portfolioUrl))
-                PortfolioLink.NavigateUri = new Uri(dto.portfolioUrl);
+            if (!string.IsNullOrWhiteSpace(dto.PortfolioUrl))
+                PortfolioLink.NavigateUri = new Uri(dto.PortfolioUrl);
 
-            if (!string.IsNullOrWhiteSpace(dto.photoUrl))
-                AvatarBrush.ImageSource = new BitmapImage(new Uri(dto.photoUrl));
-            if (!string.IsNullOrWhiteSpace(dto.backgroundUrl))
-                BgImage.Source = new BitmapImage(new Uri(dto.backgroundUrl));
+            if (!string.IsNullOrWhiteSpace(dto.PhotoUrl))
+                AvatarBrush.ImageSource = new BitmapImage(new Uri(dto.PhotoUrl));
+            if (!string.IsNullOrWhiteSpace(dto.BackgroundUrl))
+                BgImage.Source = new BitmapImage(new Uri(dto.BackgroundUrl));
 
             base.OnNavigatedTo(e);
         }
@@ -105,15 +105,15 @@ namespace LiveDJ.Presentation
 
         private sealed class DjProfileDto
         {
-            public string? name { get; set; }
-            public string? email { get; set; }
-            public string? city { get; set; }
-            public string? state { get; set; }
-            public string? photoUrl { get; set; }
-            public string? backgroundUrl { get; set; }
-            public string? bio { get; set; }
-            public string? portfolioUrl { get; set; }
-            public string[]? genres { get; set; }
+            public string? Name { get; set; }
+            public string? Email { get; set; }
+            public string? City { get; set; }
+            public string? State { get; set; }
+            public string? PhotoUrl { get; set; }
+            public string? BackgroundUrl { get; set; }
+            public string? Bio { get; set; }
+            public string? PortfolioUrl { get; set; }
+            public string[]? Genres { get; set; }
         }
     }
 }

@@ -95,6 +95,7 @@ public partial class App : Application
             new ViewMap<BookingPage>(),
             new ViewMap<StreamPage>(),
             new ViewMap<CreateProfile>(),
+            new ViewMap<DashboardPage>(),
             new ViewMap<ProfilePage>()
 );
 
@@ -109,6 +110,7 @@ public partial class App : Application
                     new ("CreateProfile", View: views.FindByView<CreateProfile>()),
                     new ("Profile", View: views.FindByView<ProfilePage>()),
                     new ("Booking", View: views.FindByView<BookingPage>()),
+                    new ("Dashboard", View: views.FindByView<DashboardPage>()),
                     new ("Stream",  View: views.FindByView<StreamPage>())
                 ]
             )

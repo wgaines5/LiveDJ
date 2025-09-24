@@ -86,27 +86,27 @@ namespace LiveDJ.Presentation
             if (data is null) return;
 
             foreach (var kvp in data
-                     .Where(k => !string.IsNullOrWhiteSpace(k.Value?.name))
-                     .OrderBy(k => k.Value!.name))
+                     .Where(k => !string.IsNullOrWhiteSpace(k.Value?.Name))
+                     .OrderBy(k => k.Value!.Name))
             {
                 var v = kvp.Value!;
                 Djs.Add(new DjListItem
                 {
                     Uid = kvp.Key,
-                    Name = v.name ?? "",
-                    City = v.city,
-                    State = v.state
+                    Name = v.Name ?? "",
+                    City = v.City,
+                    State = v.State
                 });
             }
         }
 
         private sealed class DjDto
         {
-            public string? name { get; set; }
-            public string? city { get; set; }
-            public string? state { get; set; }
-            public string? email { get; set; }
-            public string[]? genres { get; set; }
+            public string? Name { get; set; }
+            public string? City { get; set; }
+            public string? State { get; set; }
+            public string? Email { get; set; }
+            public string[]? Genres { get; set; }
         }
 
         private async void OnDjPicked(object sender, SelectionChangedEventArgs e)
@@ -130,5 +130,8 @@ namespace LiveDJ.Presentation
 
         private async void GoToSignup(object sender, RoutedEventArgs e) =>
             await Navigator.NavigateRouteAsync(this, "Signup");
+
+        private async void GoToDashboard(object sender, RoutedEventArgs e) =>
+            await this.Navigator().NavigateRouteAsync(this, "Dashboard");
     }
 }
