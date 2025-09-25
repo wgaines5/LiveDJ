@@ -1,0 +1,6 @@
+@LiveDJ.Api_HostAddress = http://localhost:5072
+
+GET {{LiveDJ.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

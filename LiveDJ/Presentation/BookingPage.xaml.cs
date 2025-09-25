@@ -1,244 +1,306 @@
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+using System.Globalization;
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
-
-using LiveDJ.Services;
-
-using Microsoft.Extensions.Options;
+using System.Text.Json;
+using LiveDJ.Services; // AuthState
+using LiveDJ.Models;
+using Microsoft.Extensions.Options; // AppConfig via IOptions
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
-using Microsoft.UI.Xaml.Media;
-using Microsoft.UI.Xaml.Navigation;
 
-using Uno.Extensions.Navigation;
-using Windows.UI; // Color.FromArgb
 
-namespace LiveDJ.Presentation
+
+namespace LiveDJ.Presentation;
+
+public sealed partial record DjListItem(string Id, string Name);
+
+public sealed partial class BookingPage : Page
 {
-    public sealed partial class BookingPage : Page
+    private readonly HttpClient _http;
+    private readonly AuthState _auth;
+    private readonly AppConfig _cfg;
+
+
+    private DjListItem? _selectedDj;
+
+
+    public BookingPage()
     {
-        private HttpClient? _http;
-        private AuthState? _auth;
-        private AppConfig? _cfg;
+        InitializeComponent();
 
-        public ObservableCollection<DjListItem> Djs { get; } = new();
 
-        // Availability cache for selected DJ
-        private readonly Dictionary<DayOfWeek, List<SlotDto>> _slotsByDow = [];
-        private bool _open = false;
-        private string _timezone = "UTC";
+        var sp = (Application.Current as App)!.Host!.Services;
+        _auth = sp.GetRequiredService<AuthState>();
+        _cfg = sp.GetRequiredService<IOptions<AppConfig>>().Value;
 
-        // brushes (avoid Microsoft.UI.Colors if it’s problematic)
-        private static readonly SolidColorBrush BrushAvail =
-            new(Color.FromArgb(0xFF, 0x90, 0xEE, 0x90)); // LightGreen
-        private static readonly SolidColorBrush BrushBlack =
-            new(Color.FromArgb(0xFF, 0x00, 0x00, 0x00));
 
-        public BookingPage()
+        _http = new HttpClient { BaseAddress = new Uri(_cfg.ApiBaseUrl) };
+
+
+        Loaded += async (_, __) =>
         {
-            InitializeComponent();
-            DataContext = this; // <-- enables {Binding Djs}
-        }
+            // Set sensible defaults
+            DatePicker.Date = DateTimeOffset.Now.AddDays(3);
+            TimePicker.Time = new TimeSpan(20, 0, 0); // 8:00 PM
+            DurationBox.SelectedIndex = 0;
 
-        private INavigator Nav => this.Navigator();
 
-        protected override async void OnNavigatedTo(NavigationEventArgs e)
-        {
-            base.OnNavigatedTo(e);
-
-            var sp = (Application.Current as App)?.Host?.Services;
-            if (sp is null) return;
-
-            _auth = sp.GetRequiredService<AuthState>();
-            _cfg = sp.GetRequiredService<IOptions<AppConfig>>().Value;
-            _http = new HttpClient { BaseAddress = new Uri(_cfg.ApiBaseUrl) };
-
-            await LoadDjsAsync();
-        }
-
-        #region Load DJs
-
-        public sealed class DjListItem
-        {
-            public string Uid { get; set; } = "";
-            public string Name { get; set; } = "";
-            public string? City { get; set; }
-            public string? State { get; set; }
-            public string Display =>
-                string.IsNullOrWhiteSpace(City) && string.IsNullOrWhiteSpace(State)
-                    ? Name
-                    : $"{Name} — {(City ?? "").Trim()} {(State ?? "").Trim()}".Trim();
-        }
-
-        private sealed class DjDto
-        {
-            public string? Name { get; set; }
-            public string? City { get; set; }
-            public string? State { get; set; }
-        }
-
-        private async Task LoadDjsAsync()
-        {
-            if (_http is null) return;
-
-            const string baseUrl = "https://live-dj-f5fad-default-rtdb.firebaseio.com/djs.json";
-            var url = string.IsNullOrEmpty(_auth?.IdToken) ? baseUrl : $"{baseUrl}?auth={_auth!.IdToken}";
-
-            Dictionary<string, DjDto>? data = null;
-            try { data = await _http.GetFromJsonAsync<Dictionary<string, DjDto>>(url); }
-            catch { /* ignore */ }
-
-            Djs.Clear();
-            if (data is null) return;
-
-            foreach (var kv in data.Where(k => !string.IsNullOrWhiteSpace(k.Value?.Name))
-                                   .OrderBy(k => k.Value!.Name))
-            {
-                var v = kv.Value!;
-                Djs.Add(new DjListItem
-                {
-                    Uid = kv.Key,
-                    Name = v.Name ?? "",
-                    City = v.City,
-                    State = v.State
-                });
-            }
-        }
-
-        #endregion
-
-        #region Availability
-
-        private sealed class AvailabilityDto
-        {
-            public bool? Open { get; set; }
-            public string? Timezone { get; set; }
-            public Dictionary<string, List<SlotDto>>? Days { get; set; }
-        }
-
-        internal sealed class SlotDto
-        {
-            public string? Start { get; set; } // "18:00"
-            public string? End { get; set; } // "23:00"
-        }
-
-        private static DayOfWeek MapKeyToDow(string key) => key switch
-        {
-            "mon" => DayOfWeek.Monday,
-            "tue" => DayOfWeek.Tuesday,
-            "wed" => DayOfWeek.Wednesday,
-            "thu" => DayOfWeek.Thursday,
-            "fri" => DayOfWeek.Friday,
-            "sat" => DayOfWeek.Saturday,
-            "sun" => DayOfWeek.Sunday,
-            _ => DayOfWeek.Sunday
+            await LoadDjs();
+            await RefreshPricePreview();
+            await RefreshAvailability();
         };
+    }
 
-        private async Task LoadAvailabilityForAsync(string uid)
+
+    private async Task LoadDjs()
+    {
+        try
         {
-            if (_http is null) return;
-
-            _slotsByDow.Clear();
-            _open = false;
-            _timezone = "UTC";
-            SlotsList.ItemsSource = null;
-            AvailCalendar.SelectedDates.Clear();
-            AvailCalendar.InvalidateArrange();
-
-            var url = $"https://live-dj-f5fad-default-rtdb.firebaseio.com/djs/{uid}/availability.json";
-            if (!string.IsNullOrEmpty(_auth?.IdToken)) url += $"?auth={_auth.IdToken}";
-
-            AvailabilityDto? dto = null;
-            try { dto = await _http.GetFromJsonAsync<AvailabilityDto>(url); }
-            catch { /* ignore */ }
-
-            if (dto is null) { StatusText.Text = "No availability found."; return; }
-
-            _open = dto.Open ?? false;
-            _timezone = dto.Timezone ?? "UTC";
-
-            if (dto.Days is not null)
+            var djs = await _http.GetFromJsonAsync<List<DjListItem>>("api/djs");
+            DjBox.Items.Clear();
+            if (djs != null)
             {
-                foreach (var kv in dto.Days)
+                foreach (var dj in djs)
                 {
-                    var dow = MapKeyToDow(kv.Key);
-                    _slotsByDow[dow] = kv.Value ?? new List<SlotDto>();
+                    DjBox.Items.Add(new ComboBoxItem { Content = dj.Name, Tag = dj });
                 }
             }
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Failed to load DJs: {ex.Message}");
+        }
+    }
 
-            StatusText.Text = _open
-                ? $"Showing availability (TZ: {_timezone})."
-                : "DJ is not open to bookings.";
 
-            // Refresh visual styling
-            AvailCalendar.CalendarViewDayItemChanging -= OnCalendarDayItemChanging;
-            AvailCalendar.CalendarViewDayItemChanging += OnCalendarDayItemChanging;
-            AvailCalendar.InvalidateMeasure();
+    private async void OnDjChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (DjBox.SelectedItem is not ComboBoxItem item || item.Tag is not DjListItem dj) return;
+
+        _selectedDj = dj; // important for Refresh* methods
+
+        DjDetails? details = null;
+        try
+        {
+            details = await _http.GetFromJsonAsync<DjDetails>($"api/djs/{dj.Id}");
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Failed to load DJ details: {ex.Message}");
+            return;
         }
 
-        // Style calendar day items: highlight days that have any slots
-        private void OnCalendarDayItemChanging(CalendarView sender, CalendarViewDayItemChangingEventArgs args)
+        if (details?.Availability != null && details.Availability.Days?.Count > 0)
         {
-            var item = args.Item;
-            var date = item.Date.Date;
-            var has = _slotsByDow.TryGetValue(date.DayOfWeek, out var list) && list.Any();
+            AvailabilityText.Text =
+                $"Available {string.Join(", ", details.Availability.Days)} " +
+                $"from {details.Availability.StartHour:00}:00 to {details.Availability.EndHour:00}:00";
+        }
+        else
+        {
+            AvailabilityText.Text = "Availability not set.";
+        }
 
-            if (!_open)
+        if (details?.Pricing != null)
+        {
+            PriceText.Text =
+                $"${details.Pricing.HourlyRateCents / 100}/hr (min {details.Pricing.MinHours} hrs)";
+        }
+        else
+        {
+            PriceText.Text = "Pricing not set.";
+        }
+
+        // Keep your preview/availability flows in sync with duration/date/time selections
+        await RefreshPricePreview();
+        await RefreshAvailability();
+    }
+
+
+
+    private async void OnDateChanged(CalendarDatePicker sender, CalendarDatePickerDateChangedEventArgs args)
+    {
+        await RefreshAvailability();
+    }
+
+
+    private async void OnTimeChanged(object sender, Microsoft.UI.Xaml.Controls.TimePickerValueChangedEventArgs args)
+    {
+        await RefreshAvailability();
+    }
+
+
+    private async void OnRefreshAvailability(object sender, RoutedEventArgs e)
+    {
+        await RefreshAvailability();
+    }
+
+
+    private async Task RefreshPricePreview()
+    {
+        PriceText.Text = string.Empty;
+        if (_selectedDj == null) return;
+        if (DurationBox.SelectedItem is not ComboBoxItem ci || ci.Tag is null) return;
+
+
+        var durationHours = int.Parse(ci.Tag.ToString()!);
+        try
+        {
+            // Optional: ask backend for computed quote (accounts for DJ rates, fees, surge, etc.)
+            var url = $"api/quotes?djId={_selectedDj.Id}&durationHours={durationHours}";
+            var quote = await _http.GetFromJsonAsync<QuoteResponse>(url);
+            if (quote != null)
             {
-                item.IsBlackout = true;
-                item.Background = null;
-                item.Foreground = null;
-                return;
+                PriceText.Text = string.Format(CultureInfo.InvariantCulture, "{0} {1:N2}", quote.Currency.ToUpperInvariant(), quote.TotalCents / 100.0);
             }
+        }
+        catch
+        {
+            // Non-fatal: pricing preview is optional
+        }
+    }
 
-            item.IsBlackout = !has;
 
-            if (has)
+    private async Task RefreshAvailability()
+    {
+        AvailabilityText.Text = "";
+        ErrorText.Text = "";
+        if (_selectedDj == null) return;
+        if (DatePicker.Date is null) return;
+
+
+        var date = DatePicker.Date.Value.Date.ToString("yyyy-MM-dd");
+        try
+        {
+            var avail = await _http.GetStringAsync($"api/djs/{_selectedDj.Id}/availability?date={date}");
+            AvailabilityText.Text = avail;
+        }
+        catch (Exception ex)
+        {
+            ShowError($"Failed to load availability: {ex.Message}");
+        }
+    }
+
+
+    private async void OnCheckout(object sender, RoutedEventArgs e)
+    {
+        ErrorText.Text = "";
+        if (!ValidateInputs(out var djId, out var eventDate, out var startTime, out var duration)) return;
+
+
+        try
+        {
+            var body = new CreateCheckoutRequest
             {
-                item.Background = BrushAvail;
-                item.Foreground = BrushBlack;
+                DjId = djId,
+                EventDate = eventDate,
+                StartTime = startTime,
+                DurationHours = duration
+            };
+
+
+            using var resp = await _http.PostAsJsonAsync("api/checkout/create", body);
+            resp.EnsureSuccessStatusCode();
+            var json = JsonDocument.Parse(await resp.Content.ReadAsStringAsync()).RootElement;
+
+
+            var processor = json.GetProperty("processor").GetString();
+            if (processor == "stripe")
+            {
+                var url = json.GetProperty("checkoutUrl").GetString();
+                if (!string.IsNullOrEmpty(url))
+                    await Windows.System.Launcher.LaunchUriAsync(new Uri(url));
             }
             else
             {
-                item.Background = null;
-                item.Foreground = null;
+                var url = json.GetProperty("approvalUrl").GetString();
+                if (!string.IsNullOrEmpty(url))
+                    await Windows.System.Launcher.LaunchUriAsync(new Uri(url));
             }
         }
-
-        private void OnSelectedDateChanged(CalendarView sender, CalendarViewSelectedDatesChangedEventArgs args)
+        catch (Exception ex)
         {
-            if (sender.SelectedDates.Count == 0)
-            {
-                SlotsList.ItemsSource = null;
-                return;
-            }
-
-            var date = sender.SelectedDates[0].Date;
-            if (!_slotsByDow.TryGetValue(date.DayOfWeek, out var slots) || slots is null || slots.Count == 0)
-            {
-                SlotsList.ItemsSource = new[] { "No slots for this day." };
-                return;
-            }
-
-            var lines = slots.Select(s => $"{s.Start} – {s.End} ({_timezone})").ToArray();
-            SlotsList.ItemsSource = lines;
+            ShowError($"Checkout failed: {ex.Message}");
         }
-
-        #endregion
-
-        #region UI events
-
-        private async void OnDjPicked(object sender, SelectionChangedEventArgs e)
-        {
-            if (DjPicker.SelectedItem is not DjListItem picked) return;
-            await LoadAvailabilityForAsync(picked.Uid);
-        }
-
-        #endregion
     }
+    private void OnCancel(object sender, RoutedEventArgs e)
+    {
+        // Navigate back or clear fields
+        if (Frame.CanGoBack)
+        {
+            Frame.GoBack();
+        }
+        else
+        {
+            // Reset form fields if no navigation history
+            DatePicker.Date = DateTimeOffset.Now.AddDays(3);
+            TimePicker.Time = new TimeSpan(20, 0, 0);
+            DurationBox.SelectedIndex = 0;
+            DjBox.SelectedIndex = -1;
+            AvailabilityText.Text = string.Empty;
+            PriceText.Text = string.Empty;
+            ErrorText.Text = string.Empty;
+        }
+    }
+
+
+    private bool ValidateInputs(out string djId, out string eventDate, out string startTime, out int duration)
+    {
+        djId = string.Empty; eventDate = string.Empty; startTime = string.Empty; duration = 0;
+
+
+        if (_selectedDj == null)
+        {
+            ShowError("Please choose a DJ.");
+            return false;
+        }
+        djId = _selectedDj.Id;
+
+
+        if (DatePicker.Date is null)
+        {
+            ShowError("Please choose a date.");
+            return false;
+        }
+        var date = DatePicker.Date.Value.Date; // DateTimeOffset
+        eventDate = date.ToString("yyyy-MM-dd");
+
+
+        var time = TimePicker.Time;
+        startTime = time.ToString(@"hh\:mm");
+
+
+        if (DurationBox.SelectedItem is not ComboBoxItem ci || ci.Tag is null)
+        {
+            ShowError("Please choose a duration.");
+            return false;
+        }
+        duration = int.Parse(ci.Tag.ToString()!);
+
+
+        return true;
+    }
+
+
+    private void ShowError(string message)
+    {
+        ErrorText.Text = message;
+    }
+    private sealed class QuoteResponse
+    {
+        public required string Currency { get; set; }
+        public int TotalCents { get; set; }
+    }
+    private sealed class CreateCheckoutRequest
+    {
+        public required string DjId { get; set; }
+        public required string EventDate { get; set; }
+        public required string StartTime { get; set; }
+        public int DurationHours { get; set; }
+    }
+
+ 
+    
+
+
 }

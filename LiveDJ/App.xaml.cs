@@ -110,7 +110,7 @@ public partial class App : Application
                     new ("CreateProfile", View: views.FindByView<CreateProfile>()),
                     new ("Profile", View: views.FindByView<ProfilePage>()),
                     new ("Booking", View: views.FindByView<BookingPage>()),
-                    new ("Dashboard", View: views.FindByView<DashboardPage>()),
+                    new ("Dashboard", View: views.FindByView<DashboardPage>()), 
                     new ("Stream",  View: views.FindByView<StreamPage>())
                 ]
             )

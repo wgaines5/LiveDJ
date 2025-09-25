@@ -1,59 +1,63 @@
 ﻿<Page
-    x:Class="LiveDJ.Presentation.BookingPage"
-    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:utu="using:Uno.Toolkit.UI"
-    Background="Transparent">
+x:Class="LiveDJ.Presentation.BookingPage"
+xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <Grid>
-        <Image Source="ms-appx:///Assets/ClubSET.png"
-               Stretch="UniformToFill"
-               Opacity="2"/>
-
         <ScrollViewer>
-            <StackPanel MaxWidth="880" Margin="16" Spacing="14">
+            <StackPanel Spacing="16" Padding="24" MaxWidth="800">
+                <TextBlock Margin="20" Text="Book a Live Set" FontSize="28" FontWeight="Bold"/>
 
-                <utu:NavigationBar Content="Book a DJ"
-                                   Background="Transparent"
-                                   Foreground="White" />
+                <!-- Date & Time -->
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <StackPanel Width="220">
+                        <TextBlock Text="Event Date"/>
+                        <CalendarDatePicker x:Name="DatePicker" DateChanged="OnDateChanged"/>
+                    </StackPanel>
+                    <StackPanel Width="150">
+                        <TextBlock Text="Start Time"/>
+                        <TimePicker Margin="7" VerticalAlignment="Top" x:Name="TimePicker" Padding="-5" TimeChanged="OnTimeChanged"/>
+                    </StackPanel>
+                    <StackPanel Width="160">
+                        <TextBlock Text="Duration"/>
+                        <ComboBox x:Name="DurationBox">
+                            <ComboBoxItem Content="2 Hours" Tag="2"/>
+                            <ComboBoxItem Content="4 Hours" Tag="4"/>
+                            <ComboBoxItem Content="6 Hours" Tag="6"/>
+                        </ComboBox>
+                    </StackPanel>
+                </StackPanel>
 
-                <!-- DJ picker -->
-                <StackPanel Spacing="6">
-                    <TextBlock HorizontalAlignment="Center" Text="Select a DJ" Foreground="White" FontWeight="SemiBold"/>
-                    <ComboBox x:Name="DjPicker"
-                              ItemsSource="{Binding Djs}"
-                              DisplayMemberPath="Display"
-                              PlaceholderText="Choose a DJ…"
-                              SelectionChanged="OnDjPicked"/>
+                <!-- DJ selector -->
+                <StackPanel>
+                    <TextBlock Text="Choose a DJ"/>
+                    <ComboBox x:Name="DjBox" PlaceholderText="Select DJ" SelectionChanged="OnDjChanged"/>
+                </StackPanel>
+
+                <!-- Price preview (optional) -->
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="Estimated Price:"/>
+                    <TextBlock x:Name="PriceText" FontWeight="SemiBold"/>
                 </StackPanel>
 
                 <!-- Availability -->
-                <Grid ColumnDefinitions="2*,*" ColumnSpacing="16" RowSpacing="8">
-
-                    <StackPanel>
-                        <TextBlock HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="White" Text="Availability Calendar"
-                                   FontWeight="SemiBold" Margin="0,0,0,6"/>
-                        <CalendarView HorizontalAlignment="Center" x:Name="AvailCalendar"
-                                      SelectionMode="Single"
-                                      CalendarViewDayItemChanging="OnCalendarDayItemChanging"
-                                      SelectedDatesChanged="OnSelectedDateChanged"/>
+                <Border Background="#11000000" Padding="12" CornerRadius="6">
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Availability" FontWeight="SemiBold"/>
+                        <TextBlock x:Name="AvailabilityText" TextWrapping="Wrap"/>
                     </StackPanel>
+                </Border>
 
-                    <StackPanel Grid.Column="1">
-                        <TextBlock Text="Available Slots" FontWeight="SemiBold" Foreground="White" Margin="0,0,0,6"/>
-                        <ItemsControl x:Name="SlotsList">
-                            <ItemsControl.ItemTemplate>
-                                <DataTemplate>
-                                    <Border Background="#22000000" CornerRadius="8" Padding="10" Margin="0,4">
-                                        <TextBlock Text="{Binding}"/>
-                                    </Border>
-                                </DataTemplate>
-                            </ItemsControl.ItemTemplate>
-                        </ItemsControl>
-                    </StackPanel>
-                </Grid>
+                <!-- Errors -->
+                <TextBlock x:Name="ErrorText" Foreground="Red" TextWrapping="Wrap"/>
 
-                <TextBlock x:Name="StatusText" TextWrapping="Wrap"/>
+                <!-- Actions -->
+                <StackPanel Orientation="Horizontal" Spacing="12">
+                    <Button Content="Reserve (Pay Now)" Click="OnCheckout"/>
+                    <Button Content="Refresh Availability" Click="OnRefreshAvailability"/>
+                    
+                </StackPanel>
+                <Button Content="Cancel" Click="OnCancel" Background="Red"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>
